@@ -1,0 +1,7 @@
+http://www.correlatesofwar.org/data-sets/world-religion-data/wrp-national-data-1/view
+
+https://www.acleddata.com/
+
+https://data.worldbank.org/indicator/SP.POP.TOTL
+
+https://github.com/awesomedata/awesome-public-datasets#searchengines
