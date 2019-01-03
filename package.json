@@ -1,5 +1,5 @@
 {
-  "name": "marketstatistics",
+  "name": "conflictstatistics",
   "version": "0.1.0",
   "private": false,
   "author": "Johan Söderlund",
@@ -10,6 +10,7 @@
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-scripts": "2.1.1",
+    "react-table": "^6.8.6",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0"
   },
