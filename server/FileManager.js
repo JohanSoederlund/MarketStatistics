@@ -2,11 +2,10 @@ var mysql = require('mysql');
 var LineByLineReader = require('line-by-line');
 
 var databaseName = "ConflictStatistics";
-//var fileAdr = "./../datasets/conflict.csv";
-//var fileAdr = "./../datasets/population.csv";
 var fileAdrConflict = "/home/johan/studier/2dv513/assignment3/conflictstatistics/datasets/conflict.csv";
 var fileAdrPopulation = "/home/johan/studier/2dv513/assignment3/conflictstatistics/datasets/population.csv";
 var fileAdrReligion = "/home/johan/studier/2dv513/assignment3/conflictstatistics/datasets/religion.csv";
+var fileAdrGDP = "/home/johan/studier/2dv513/assignment3/conflictstatistics/datasets/gdp.csv";
 
 
 var con;
@@ -22,10 +21,84 @@ con = mysql.createConnection({
     database: databaseName
 });
 
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+    readCSVPopulation(fileAdrPopulation);
+});
+
 //query("set names 'utf8mb4'");
-readCSVPopulation(fileAdrPopulation);
 
+/**
+ * Reads from csv file, line by line
+ * Population and macro data
+ * @param {String} fileAdr 
+ */
+function readCSVPopulation(fileAdr) {
+    var lr = new LineByLineReader(fileAdr);
+    
+    lr.on('error', function (err) {
+        console.error(err);
+    });
+    
+    var lineIndex = 0;
+    lr.on('line', function (line) {
+        line = mysql_real_escape_string(line);
+        var startYear = 1960;
+        var lineArr = line.split("\t");
 
+        insertCountryValues.push([
+            lineArr[1],
+            lineArr[0]]
+        );
+        lineIndex++;
+        var missingData = 1;
+        for(var y = 1997; y <= 2017; y++ ) {
+            
+            var population = 0;
+            if (lineArr[y-startYear+3] <= 0){
+                population = parseInt(lineArr[y-startYear+3-missingData]);
+                missingData++;
+            } 
+            else {
+                population = parseInt(lineArr[y-startYear+3]);
+            }
+            insertMacroValues.push([
+                lineIndex,
+                y,
+                population,
+                y]
+            );
+        }
+        
+    });
+
+    /**
+     * All lines are read, file is closed now.
+     */
+    lr.on('end', function () {
+        insertInto(insertCountryValues, "country")
+        .then((result) => {
+            console.log(result);
+            insertInto(insertMacroValues, "macro")
+                .then((result2) => {
+                    console.log(result2);
+                    readCSVConflict(fileAdrConflict);
+                });
+        })
+        .catch((error) => {
+            console.log(error);
+            con.end();
+        });
+    });
+
+}
+
+/**
+ * Reads from csv file, line by line
+ * Conflict data
+ * @param {String} fileAdr 
+ */
 function readCSVConflict(fileAdr) {
     var lr = new LineByLineReader(fileAdr);
     
@@ -101,6 +174,7 @@ function readCSVConflict(fileAdr) {
                         insertInto(insertConflictValues.slice(chunk*4, insertConflictValues.length-1), "conflict")
                         .then((result) => {
                             console.log(result);
+                            readCSVGDP(fileAdrGDP);
                         })
                     })
                 })
@@ -115,66 +189,58 @@ function readCSVConflict(fileAdr) {
 }
 
 /**
- * Reads from json file, line by line
+ * Reads from csv file, line by line
+ * GDP data
  * @param {String} fileAdr 
  */
-function readCSVPopulation(fileAdr) {
+function readCSVGDP(fileAdr) {
     var lr = new LineByLineReader(fileAdr);
-    
     lr.on('error', function (err) {
         console.error(err);
     });
-    
-    
-    var lineIndex = 0;
+
     lr.on('line', function (line) {
         line = mysql_real_escape_string(line);
-        var startYear = 1960;
+        
         var lineArr = line.split("\t");
+        var country = lineArr[0];
+        var country_id;
+        var macro_year = 2017;
+        var gdp;
 
-        insertCountryValues.push([
-            lineArr[1],
-            lineArr[0]]
-        );
-        lineIndex++;
-        var missingData = 1;
-        for(var y = 1997; y <= 2017; y++ ) {
+        lr.pause();
+        var selectQuery = 'SELECT country_id FROM country WHERE country_name="' + country + '"';
+         
+        con.query(selectQuery, function (error, result, rows, fields) {
+            if (error) console.log(error);
+
+            country_id = result[0].country_id;
+            // Every line of data is 62 elements, where last index represents year 2017.
+            for(var i = 61; i > 40; i--) {
+                if (lineArr[i] === "") {
+                    gdp = 0;
+                } else {
+                    gdp = parseInt(lineArr[i]);
+                }
+                
+                var updateQuery = 'UPDATE macro SET gdp = "' + gdp + '" WHERE country_id="' + country_id + '" AND macro_year="' + macro_year + '"';
             
-            var population = 0;
-            if (lineArr[y-startYear+3] <= 0){
-                population = parseInt(lineArr[y-startYear+3-missingData]);
-                missingData++;
-            } 
-            else {
-                population = parseInt(lineArr[y-startYear+3]);
+                con.query(updateQuery, function (error, result, rows, fields) {
+                    if (error) {
+                        console.log(error);
+                    }
+                });
+
+                macro_year--;
             }
-            insertMacroValues.push([
-                lineIndex,
-                y,
-                population,
-                y]
-            );
-        }
+            lr.resume();
+        });
         
     });
 
-    /**
-     * All lines are read, file is closed now.
-     */
     lr.on('end', function () {
-        insertInto(insertCountryValues, "country")
-        .then((result) => {
-            console.log(result);
-            insertInto(insertMacroValues, "macro")
-                .then((result2) => {
-                    console.log(result2);
-                    readCSVConflict(fileAdrConflict);
-                });
-        })
-        .catch((error) => {
-            console.log(error);
-            con.end();
-        });
+        console.log("INSERT INTO GDP MACRO");
+        con.end();
     });
 
 }
@@ -262,6 +328,10 @@ function dropTable (tableName) {
     });
 }
 
+/**
+ * Creates three tables in database
+ * @param {String} dbName 
+ */
 function connectAndCreateTables(dbName) {
     con = mysql.createConnection({
         host: "localhost",
@@ -282,7 +352,7 @@ function connectAndCreateTables(dbName) {
                 createTable(element)
                 .then((result) => {
                     console.log(result);
-                    
+                    query("set names 'utf8mb4'");
                 })
                 .catch((err) => {
                     console.log(err);
@@ -294,6 +364,11 @@ function connectAndCreateTables(dbName) {
     });
 }
 
+/**
+ * Creates a database
+ * @param {String} fileAdr 
+ * @param {String} dbName 
+ */
 function connectAndCreateDatabase(fileAdr, dbName) {
     con = mysql.createConnection({
         host: "localhost",
@@ -310,6 +385,10 @@ function connectAndCreateDatabase(fileAdr, dbName) {
       });
 }
 
+/**
+ * Removes escape sub-strings from input-string.
+ * @param {String} str 
+ */
 function mysql_real_escape_string (str) {
     return str.replace(/[\0\x08\x1a\n\r"'\\\%]/g, function (char) {
         switch (char) {
