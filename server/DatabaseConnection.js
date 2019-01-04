@@ -1,13 +1,18 @@
 var mysql = require('mysql');
 
 var databaseName = "ConflictStatistics";
-var pw = "";
+var pw = "qcj5hi5hi5";
 
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: pw,
     database: databaseName
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
 });
 
 module.exports = con;

@@ -6,22 +6,38 @@ var databaseManager = require('./DatabaseManager');
 
 io.on('connection', client => {
     console.log("io.on connection");
+    /*
     client.on('connect', function(){
         console.log("CONNECTED");
     });
+    */
 
-  client.on('query', query => { 
-      console.log("query: " + query);
+  client.on('updateTable', query => { 
+      console.log("updateTable: " + query);
       
       databaseManager.query(query)
       .then((res) => {
-        client.emit("query", res);
+        client.emit("updateTable", res);
       })
       .catch((err) => {
         console.log(err);
-        client.emit("query", err);
+        client.emit("updateTable", err);
       });
       
+  });
+
+  client.on('getCountries', query => { 
+    console.log("getCountries: " + query);
+    
+    databaseManager.query(query)
+    .then((res) => {
+      client.emit("getCountries", res);
+    })
+    .catch((err) => {
+      console.log(err);
+      client.emit("getCountries", err);
+    });
+    
   });
 
   client.on('disconnect', () => {

@@ -9,6 +9,8 @@ var con = require('./DatabaseConnection');
  * @param {String} sql 
  */
 module.exports = {
+
+    
     
     query(sql) {
         return new Promise((resolve) => {
