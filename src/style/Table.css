@@ -1,0 +1,21 @@
+
+
+.ReactTable {
+    width: 100%;
+    align-items: center;
+}
+
+.rt-td {
+    font-size: calc(1px + 1vmin);
+    white-space: unset;
+    background-color: rgba(201, 201, 201, 0.1);
+    
+}
+
+.rt-th {
+    background-color: rgb(179,136,235, 0.3);
+    border: 1px solid grey;
+    font-size: calc(5px + 1vmin);
+    white-space: unset;
+}
+

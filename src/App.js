@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import './style/App.css';
+import './style/Table.css';
 import socket from './websocket.js';
 import Table from './Table.js';
 import Form from './Form.js';
+import ShowForm from './ShowForm.js';
 
 var columns = [];
 var cellData = [];
-var countries = [{value: "ALL", label: "ALL"}];
-var years = [{value: "ALL", label: "ALL"},
+var countries = [{value: "*", label: "ALL"}];
+var years = [{value: 0, label: "ALL"},
 {value: 1997, label: "1997"},
 {value: 1998, label: "1998"},
 {value: 1999, label: "1999"},
@@ -33,22 +35,36 @@ var years = [{value: "ALL", label: "ALL"},
 
 class App extends Component {
 
+  constructor(props) {
+    super(props);
+    socket.emit("getCountries", "CALL sp_getCountries()");
+    this.state = {showTable: false};
+  }
+
   componentDidMount() {
+    
     socket.on('updateTable', function(data){
-      console.log(JSON.stringify(data));
-      
-      var keyNames = Object.keys(data[0][0]);
+      columns = [];
+      cellData = [];
+      if(data[0].length > 0) {
+        var keyNames = Object.keys(data[0][0]);
 
-      keyNames.forEach(element => {
-        columns.push({
-          Header: element,
-          accessor: element // String-based value accessors!
+        keyNames.forEach(element => {
+          columns.push({
+            Header: element,
+            accessor: element // String-based value accessors!
+          });
+  
         });
-
-      });
-      cellData = data[0];
+        cellData = data[0];
+      } else {
+        columns.push({
+          Header: "No Data",
+          accessor: "No Data" // String-based value accessors!
+        });
+      }
       
-      this.setState({});
+      this.setState({showTable: true});
     }.bind(this));
 
     socket.on('getCountries', function(data){
@@ -56,24 +72,46 @@ class App extends Component {
       data[0].forEach(element => {
         countries.push({value: element.country_name, label: element.country_name});
       });
-
-      this.setState(this.state);
+      
+      this.setState({showTable: false});
     }.bind(this));
-
-    //socket.emit("updateTable", "CALL sp_getCountryFatalities4('*', 2001)");
-    socket.emit("getCountries", "CALL sp_getCountries()");
     this.setState(this.state);
   }
 
   
+
+  
   render() {
+    const showTable = this.state.showTable;
+    let table;
+    let form;
+    let showForm;
+    let tableHeading;
+
+    if (showTable) {
+      form = <p></p>
+      table = <Table data={cellData} columns = {columns}/>;
+      showForm = <ShowForm/>;
+      tableHeading = <h3>CONFLICT AND MACRO DATA</h3>;
+    } else {
+      form = <Form countries={countries} years={years}/>
+      tableHeading = <p></p>;
+      table = <p></p>;
+      showForm = <p></p>;;
+    }
+
     return (
       <div className="App">
         <header className="App-header">
-
-          
-        <Form countries={countries} years={years}/>
-        <Table data={cellData} columns = {columns}/>
+        <h1 class="title-heading">CONFLICT STATISTICS</h1>
+        
+        {form}
+        {showForm}
+        
+        <div id="wrap">
+          {tableHeading}
+          {table}
+        </div>
 
         </header>
       </div>
@@ -83,8 +121,3 @@ class App extends Component {
 }
 
 export default App;
-
-//<Table data={cellData} columns = {columns}/>
-
-//<Form data={cellData} columns = {columns}/>
-//<Form />

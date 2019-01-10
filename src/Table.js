@@ -2,21 +2,18 @@ import React, { Component } from 'react';
 import ReactTable from "react-table";
 
 class Table extends Component {
-/*
-    constructor(props) {
-        super(props);
-        // Don't call this.setState() here!
-        //this.state = { counter: 0 };
-        //this.handleClick = this.handleClick.bind(this);
-      }
-      */
-
+   
+    
     render() {
+
+        //const customColumnStyle = { wi: "5px", backgroundColor: "green" };
+    //style={customColumnStyle}
+
         return(
-        <ReactTable
-            data={this.props.data}
-            columns={this.props.columns}
-        />)
+            <ReactTable 
+                data={this.props.data}
+                columns={this.props.columns}
+            />)
     }
 
 }

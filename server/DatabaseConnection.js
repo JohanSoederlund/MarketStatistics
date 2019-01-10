@@ -1,7 +1,7 @@
 var mysql = require('mysql');
 
 var databaseName = "ConflictStatistics";
-var pw = "qcj5hi5hi5";
+var pw = "";
 
 var con = mysql.createConnection({
     host: "localhost",

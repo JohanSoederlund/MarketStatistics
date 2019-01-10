@@ -1,9 +1,10 @@
-CALL sp_getCountryFatalities('Afghanistan', 1999);
 
-CALL sp_getCountryFatalities2('Laos', 1999);
 
-CALL sp_getCountryFatalities3('*', 1999);
 
-CALL sp_getCountryFatalities4('Afghanistan', 2001);
+CALL sp_getConflictsYear(1999);
 
-CALL sp_getCountryFatalities5('*', 0);
+CALL sp_getConflictsCountry('Angola');
+
+CALL sp_getConflictsCountryYear('Angola', 1999);
+
+CALL sp_getMacro('*', 1999);

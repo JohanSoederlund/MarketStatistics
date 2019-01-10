@@ -7,8 +7,10 @@ import socket from './websocket.js';
 class Form extends Component {
 
     state = {
-        selectedCountryOption: null,
-        selectedYearOption: null,
+        selectedCountryOption: {value: "*"},
+        selectedYearOption: {value: 0},
+        macro: false,
+        conflicts: false,
       }
 
   constructor(props) {
@@ -17,6 +19,8 @@ class Form extends Component {
 
     this.handleCountryChange = this.handleCountryChange.bind(this);
     this.handleYearChange = this.handleYearChange.bind(this);
+    this.handleMacroChange = this.handleChange.bind(this);
+    
 
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -26,30 +30,46 @@ class Form extends Component {
   }
 
   handleSubmit(event) {
-    //alert('A name was submitted: ' + this.state.country_name);
-    var query = 'CALL sp_getCountryFatalities4("' + this.state.selectedOption.value + '", 2001)';
-
-    if (this.state.selectedOption === null) socket.emit("updateTable", "CALL sp_getCountryFatalities4('*', 2001)")
-    else if (this.state.selectedOption === "ALL") socket.emit("updateTable", "CALL sp_getCountryFatalities4('*', 2001)")
-    else socket.emit("updateTable", query)
-    
     event.preventDefault();
+    var query;
+
+    if(this.state.macro) {
+      query = "CALL sp_getMacro('" + this.state.selectedCountryOption.value + "', " + this.state.selectedYearOption.value + ")";
+      socket.emit("updateTable", query)
+      console.log(query);
+    } else if(this.state.conflicts) {
+      query = "CALL sp_getConflicts('" + this.state.selectedCountryOption.value + "', " + this.state.selectedYearOption.value + ")";
+      socket.emit("updateTable", query)
+      console.log(query);
+    } else {
+      query = "CALL sp_getMacroSmall('" + this.state.selectedCountryOption.value + "', " + this.state.selectedYearOption.value + ")";
+      socket.emit("updateTable", query)
+      console.log(query);
+    }
+    
   }
 
   handleCountryChange = (selectedCountryOption) => {
-    this.setState({ selectedCountryOption });
+    this.setState({selectedCountryOption});
   }
 
   handleYearChange = (selectedYearOption) => {
-    this.setState({ selectedYearOption });
+    this.setState({selectedYearOption});
   }
 
   handlePopulationChange = () => {
     this.setState({  });
   }
 
-  handleGDPChange = () => {
-    this.setState({  });
+  
+  handleChange = (event) => {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
   }
 
 
@@ -57,29 +77,50 @@ class Form extends Component {
     const { selectedCountryOption, selectedYearOption } = this.state;
 
     return(
+      <form className='statisticsForm' onSubmit={this.handleSubmit}>
         
+        <div className="groups">
+          <div className="check">
+            <input id="check" name="conflicts" type="checkbox" value={this.state.conflicts} onChange={this.handleChange}></input>
+            <label for="check"></label>
+          </div>
+          <div className="element">
+            <label className="labels">Conflicts</label>
+          </div>
+          
+          <div className="check2">
+            <input id="check2" name="macro" type="checkbox" checked={this.state.macro} onChange={this.handleChange}></input>
+            <label for="check2"></label>
+          </div>   
+          <div className="element">
+            <label className="labels">Macro</label>
+          </div>
+        </div>
 
-        <form onSubmit={this.handleSubmit}>
+        <div className="groups1">
             <Select
                 value={selectedCountryOption}
                 onChange={this.handleCountryChange}
                 options={this.props.countries}
             />
-
+            <div className="element">
+                  <label className="labels">Country</label>
+            </div>
             <Select
-                value={selectedYearOption}
-                onChange={this.handleYearChange}
-                options={this.props.years}
+                  value={selectedYearOption}
+                  onChange={this.handleYearChange}
+                  options={this.props.years}
             />
-           
-            <input type="checkbox" value="Population" onChange={this.handlePopulationChange}></input>
-            <input type="checkbox" value="GDP/Capita" onChange={this.handleGDPChange}></input>
+             <div className="element">
+              <label className="labels">Year</label>
+            </div>
+        </div>
 
-            <input type="submit" value="SUBMIT" />
-        </form>)
-        
+        <input className="button" id="submit-button" align="center" type="submit" value="SUBMIT" />
+      </form>)
+      
 
-      }
+    }
 
 
 }
