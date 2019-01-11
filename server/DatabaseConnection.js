@@ -1,12 +1,14 @@
 var mysql = require('mysql');
 
-var databaseName = "ConflictStatistics";
-var pw = "";
+const databaseName = "ConflictStatistics";
+const host = "localhost";
+const user = "root";
+const password = "";
 
 var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: pw,
+    host: host,
+    user: user,
+    password: password,
     database: databaseName
 });
 

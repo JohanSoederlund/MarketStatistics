@@ -1,3 +1,29 @@
+# CONFLICT STATISTICS
+
+This application is a SQL database for macro-statistics for countries (fatalities, population and GDP), combined with conflict data (wars, uprisings, demonstrations). Reason for my idea is to get interesting statistical causalities between conflicts and other data. It will also be a pure database for reported conflicts around the world.
+
+## Installation
+1. Clone the project.
+2. Download and install [https://dev.mysql.com/downloads/](MySQL)
+3. Download [https://we.tl/t-MJmDxslnIu](data set) and move files to ConflictStatistics/datasets
+4. Change credentials in FileManager and DatabaseConnection
+    * const host = "localhost";
+    * const user = "root";
+    * const password = "";
+5. Run 'Node server/FileManager
+6. Run 'Node server/websocket
+7. Run npm start
+8. Open [localhost:3000](ConflictStatistics) in browser
+
+
+# Other resources
+
+* [https://erdplus.com](erdplus) for modeling
+* [https://raw.githubusercontent.com/JohanSoederlund/conflictstatistics/master/ER.png](ER model)
+* [https://www.youtube.com/channel/UCJwDeeR-CbWUAGIemcENFww?view_as=subscriber](Video presentation)
+
+# React
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -36,9 +62,3 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
