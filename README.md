@@ -4,8 +4,8 @@ This application is a SQL database for macro-statistics for countries (fatalitie
 
 ## Installation
 1. Clone the project.
-2. Download and install [https://dev.mysql.com/downloads/](MySQL)
-3. Download [https://we.tl/t-MJmDxslnIu](data set) and move files to ConflictStatistics/datasets
+2. Download and install [MySQL](https://dev.mysql.com/downloads/)
+3. Download [data set](https://we.tl/t-MJmDxslnIu) and move files to ConflictStatistics/datasets
 4. Change credentials in FileManager and DatabaseConnection
     * const host = "localhost";
     * const user = "root";
@@ -13,14 +13,19 @@ This application is a SQL database for macro-statistics for countries (fatalitie
 5. Run 'Node server/FileManager
 6. Run 'Node server/websocket
 7. Run npm start
-8. Open [localhost:3000](ConflictStatistics) in browser
+8. Open [ConflictStatistics](localhost:3000) in browser
+
+## Data source
+* [The correlates of war project](http://www.correlatesofwar.org/data-sets/world-religion-data/wrp-national-data-1/view) for religion statistics
+* [ACLED](https://www.acleddata.com/) for conflict statistics
+* [World bank](https://data.worldbank.org/) for gdp and population statistics
 
 
 # Other resources
 
-* [https://erdplus.com](erdplus) for modeling
-* [https://raw.githubusercontent.com/JohanSoederlund/conflictstatistics/master/ER.png](ER model)
-* [https://www.youtube.com/channel/UCJwDeeR-CbWUAGIemcENFww?view_as=subscriber](Video presentation)
+* [erdplus](https://erdplus.com) for modeling
+* [ER model](https://raw.githubusercontent.com/JohanSoederlund/conflictstatistics/master/ER.png)
+* [Video presentation](https://www.youtube.com/channel/UCJwDeeR-CbWUAGIemcENFww?view_as=subscriber)
 
 # React
 
