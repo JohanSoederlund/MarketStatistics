@@ -8,7 +8,7 @@ BEGIN
     ROUND(m.gdp / m.population) 'GDP/cap US$', ((SUM(c2.fatalities)) * 1000 / m.population) '(fatalities/cap) * 1T', 
     ((SUM(c2.fatalities)) * 1000000 / m.gdp ) '(fatalities/gdp) * 1M'
     
-FROM country c, conflict c2, macro m
+FROM Country c, Conflict c2, Macro m
 
 WHERE c.country_id = c2.country_id and m.country_id = c2.country_id
 

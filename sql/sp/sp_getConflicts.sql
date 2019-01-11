@@ -7,7 +7,7 @@ BEGIN
     c2.event_type 'conflict event', c2.actor1 'actor1', c2.actor2 'actor2', c2.location 'location',
     m.population
     
-FROM country c, conflict c2, macro m
+FROM Country c, Conflict c2, Macro m
 
 WHERE c.country_id = c2.country_id and m.country_id = c2.country_id
 

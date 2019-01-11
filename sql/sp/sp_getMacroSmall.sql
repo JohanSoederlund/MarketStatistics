@@ -4,10 +4,10 @@ CREATE PROCEDURE sp_getMacroSmall
 (IN p_country VARCHAR(40), IN p_year int(11))
 BEGIN
 	SELECT DISTINCT c.country_name 'country', c2.conflict_year 'year', 
-    SUM(c2.fatalities) AS sum_fatalities, Cast(ROUND(m.population/1000) as char) 'population /T'
+    SUM(c2.fatalities) AS 'sum fatalities', Cast(ROUND(m.population/1000) as char) 'population / T'
 
     
-FROM country c, conflict c2, macro m
+FROM Country c, Conflict c2, Macro m
 
 WHERE c.country_id = c2.country_id and m.country_id = c2.country_id
 

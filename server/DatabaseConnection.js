@@ -17,24 +17,3 @@ con.connect(function(err) {
 
 module.exports = con;
 
-/*
-var connection = {
-    con: mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: pw,
-        database: databaseName
-    }),
-
-    end: mysql.end()
-} 
-*/
-
-//var end = con.end();
-
-/*
-module.exports = {
-    con,
-    end
-}
-*/

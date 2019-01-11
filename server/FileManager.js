@@ -1,31 +1,42 @@
 var mysql = require('mysql');
 var LineByLineReader = require('line-by-line');
 
-var databaseName = "ConflictStatistics";
+
 var fileAdrConflict = "/home/johan/studier/2dv513/assignment3/conflictstatistics/datasets/conflict.csv";
 var fileAdrPopulation = "/home/johan/studier/2dv513/assignment3/conflictstatistics/datasets/population.csv";
 var fileAdrReligion = "/home/johan/studier/2dv513/assignment3/conflictstatistics/datasets/religion.csv";
 var fileAdrGDP = "/home/johan/studier/2dv513/assignment3/conflictstatistics/datasets/gdp.csv";
 
-
 var con;
 var insertCountryValues = [];
 var insertMacroValues = [];
 var insertConflictValues = [];
+var insertActorValues = [];
+
+var databaseName = "ConflictStatistics";
+const host = "localhost";
+const user = "root";
+const password = "";
 
 
 con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: databaseName
+    host: host,
+    user: user,
+    password: password
 });
 
 con.connect(function(err) {
     if (err) throw err;
     console.log("Connected!");
-    readCSVPopulation(fileAdrPopulation);
+    
+    createDatabase()
+    .then((result) => {
+        console.log(result);
+        connectAndCreateTables();
+    })
+    
 });
+
 
 //query("set names 'utf8mb4'");
 
@@ -106,6 +117,7 @@ function readCSVConflict(fileAdr) {
         console.error(err);
     });
 
+    var conflict_id = 1;
     lr.on('line', function (line) {
         line = mysql_real_escape_string(line);
         var lineArr = line.split("\t");
@@ -133,23 +145,37 @@ function readCSVConflict(fileAdr) {
         if (lineArr[7] !== "") event_type = lineArr[7];
         var fatalities = null;
         if (lineArr[27] >= 0) fatalities = parseInt(lineArr[27]);
-        var event_date;
-        if (lineArr[4] !== "") event_date = new Date(lineArr[4]).toISOString().slice(0, 10);
+        var conflict_date;
+        if (lineArr[4] !== "") conflict_date = new Date(lineArr[4]).toISOString().slice(0, 10);
+        var conflict_year;
+        if (lineArr[4] !== "") conflict_year = conflict_date.slice(0, 4);
         var location;
         if (lineArr[4] !== "") location = lineArr[20];
 
         insertConflictValues.push([
             country_id,
-            actor1,
-            actor2,
-            associative_actor1,
-            associative_actor2,
             event_type,
             fatalities,
-            event_date,
+            conflict_date,
+            conflict_year,
             location
-        ]
-        );
+        ]);
+
+        if (conflict_id < 425693) {
+            insertActorValues.push([
+                conflict_id,
+                actor1,
+                associative_actor1
+            ]);
+            
+            insertActorValues.push([
+                conflict_id,
+                actor2,
+                associative_actor2
+            ]);
+        }
+        
+        conflict_id++;
     });
 
     /**
@@ -157,29 +183,68 @@ function readCSVConflict(fileAdr) {
      */
     lr.on('end', function () {
         console.log("INSERT INTO CONFLICT");
-        
+
         var chunk = 100000;
         insertInto(insertConflictValues.slice(0, chunk), "conflict")
         .then((result) => {
+            
+        console.log(result);
+        insertInto(insertConflictValues.slice(chunk, chunk*2), "conflict")
+        .then((result) => {
+            
+        console.log(result);
+        insertInto(insertConflictValues.slice(chunk*2, chunk*3), "conflict")
+        .then((result) => {
+            
+        console.log(result);
+        insertInto(insertConflictValues.slice(chunk*3, chunk*4), "conflict")
+        .then((result) => {
+            
+        console.log(result);
+        insertInto(insertConflictValues.slice(chunk*4, insertConflictValues.length-1), "conflict")
+        .then((result) => {
+                            
             console.log(result);
-            insertInto(insertConflictValues.slice(chunk, chunk*2), "conflict")
+
+            insertInto(insertActorValues.slice(0, chunk), "actor")
             .then((result) => {
-                console.log(result);
-                insertInto(insertConflictValues.slice(chunk*2, chunk*3), "conflict")
-                .then((result) => {
-                    console.log(result);
-                    insertInto(insertConflictValues.slice(chunk*3, chunk*4), "conflict")
-                    .then((result) => {
-                        console.log(result);
-                        insertInto(insertConflictValues.slice(chunk*4, insertConflictValues.length-1), "conflict")
-                        .then((result) => {
-                            console.log(result);
-                            readCSVGDP(fileAdrGDP);
-                        })
-                    })
-                })
-            })
-        })
+            console.log(result);
+
+            insertInto(insertActorValues.slice(chunk, chunk*2), "actor")
+            .then((result) => {
+                
+            console.log(result);
+            insertInto(insertActorValues.slice(chunk*2, chunk*3), "actor")
+            .then((result) => {
+                
+            console.log(result);
+            insertInto(insertActorValues.slice(chunk*3, chunk*4), "actor")
+            .then((result) => {
+                
+            console.log(result);
+            insertInto(insertActorValues.slice(chunk*4, chunk*5), "actor")
+            .then((result) => {
+            console.log(result);
+
+            insertInto(insertActorValues.slice(chunk*5, chunk*6), "actor")
+            .then((result) => {
+                
+            console.log(result);
+            insertInto(insertActorValues.slice(chunk*6, chunk*7), "actor")
+            .then((result) => {
+                
+            console.log(result);
+            insertInto(insertActorValues.slice(chunk*7, chunk*8), "actor")
+            .then((result) => {
+
+            console.log(result);
+            insertInto(insertActorValues.slice(chunk*8, insertActorValues.length-1), "actor")
+            .then((result) => {
+                readCSVGDP(fileAdrGDP);
+            });
+            })})})})})})})})
+            
+        })})})})})
         .catch((error) => {
             console.log(error);
             con.end();
@@ -209,10 +274,13 @@ function readCSVGDP(fileAdr) {
         var gdp;
 
         lr.pause();
-        var selectQuery = 'SELECT country_id FROM country WHERE country_name="' + country + '"';
-         
+        var selectQuery = 'SELECT country_id FROM Country WHERE country_name="' + country + '"';
+        
         con.query(selectQuery, function (error, result, rows, fields) {
-            if (error) console.log(error);
+            if (error){
+                console.log(country);
+                console.log(error);
+            } 
 
             country_id = result[0].country_id;
             // Every line of data is 62 elements, where last index represents year 2017.
@@ -223,7 +291,7 @@ function readCSVGDP(fileAdr) {
                     gdp = parseInt(lineArr[i]);
                 }
                 
-                var updateQuery = 'UPDATE macro SET gdp = "' + gdp + '" WHERE country_id="' + country_id + '" AND macro_year="' + macro_year + '"';
+                var updateQuery = 'UPDATE Macro SET gdp = "' + gdp + '" WHERE country_id="' + country_id + '" AND macro_year="' + macro_year + '"';
             
                 con.query(updateQuery, function (error, result, rows, fields) {
                     if (error) {
@@ -251,15 +319,19 @@ function readCSVGDP(fileAdr) {
  */
 function insertInto(values, tableName) {
     var sql;
+
     switch (tableName) {
         case "conflict":
-            sql = "INSERT INTO conflict (country_id, actor1, actor2, associative_actor1, associative_actor2, event_type, fatalities, conflict_date, location) VALUES ?";   
+            sql = "INSERT INTO Conflict (country_id, event_type, fatalities, conflict_date, conflict_year, location) VALUES ?";   
             break;
         case "country":
-            sql = "INSERT INTO country (country_code, country_name) VALUES ?";
+            sql = "INSERT INTO Country (country_code, country_name) VALUES ?";
             break;
         case "macro":
-            sql = "INSERT INTO macro (country_id, gdp, population, macro_year) VALUES ?";
+            sql = "INSERT INTO Macro (country_id, gdp, population, macro_year) VALUES ?";
+            break;
+        case "actor":
+            sql = "INSERT INTO Actor (conflict_id, actor_name, associative_actor) VALUES ?";
             break;
         default:
             break;
@@ -290,9 +362,9 @@ function query(sql) {
 /**
  * Create a new Database.
  */
-function createDatabase(name) {
+function createDatabase() {
     return new Promise((resolve) => {
-        var query = "CREATE DATABASE "+name;
+        var query = "CREATE DATABASE " + databaseName;
         con.query(query, function (err, result) {
             if (err) throw err;
             console.log("Database created");
@@ -330,29 +402,55 @@ function dropTable (tableName) {
 
 /**
  * Creates three tables in database
- * @param {String} dbName 
  */
-function connectAndCreateTables(dbName) {
+function connectAndCreateTables() {
+    con.end();
+    
     con = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "",
-        database: dbName
+        host: host,
+        user: user,
+        password: password,
+        database: databaseName
       });
 
     con.connect(function(err) {
         if (err) throw err;
         console.log("Connected!");
         try {
+            query("ALTER DATABASE ConflictStatistics CHARACTER SET = 'utf8mb4' COLLATE = 'utf8mb4_unicode_ci'");
             var sql = [];
-            sql.push("CREATE TABLE Conflict (conflict_id int PRIMARY KEY auto_increment, country_id int FOREIGN KEY, actor1 varchar(15), actor2 varchar(15), associative_actor1 varchar(15), associative_actor2 varchar(15), event_type varchar(15), date Date, fatalities int, location varchar(15))");
-            sql.push("CREATE TABLE Country (country_id int PRIMARY KEY auto_increment, country_code varchar(3), name varchar(20))");
-            sql.push("CREATE TABLE Macro (macro_id int PRIMARY KEY auto_increment, country_id int FOREIGN KEY, GDP int, population int, year int)");
+            sql.push("CREATE TABLE Country (country_id int PRIMARY KEY auto_increment, country_code varchar(3), country_name varchar(40))");
+            sql.push("CREATE TABLE Conflict (conflict_id int PRIMARY KEY auto_increment, country_id int NOT NULL DEFAULT 0, event_type varchar(1000), fatalities int, conflict_date Date, conflict_year int, location varchar(1000))");
+            sql.push("CREATE TABLE Macro (macro_id int PRIMARY KEY auto_increment, country_id int NOT NULL DEFAULT 0, gdp bigint(20), population bigint(20), macro_year int)");
+            sql.push("CREATE TABLE Actor (actor_id int PRIMARY KEY auto_increment, conflict_id int NOT NULL DEFAULT 0, actor_name varchar(1000), associative_actor varchar(1000))");
+            var counter = 0;
             sql.forEach(element => {
                 createTable(element)
                 .then((result) => {
+                    counter++;
                     console.log(result);
-                    query("set names 'utf8mb4'");
+                    
+                    if(counter === 4) {
+                        query("ALTER TABLE Conflict ADD CONSTRAINT fk_country_id FOREIGN KEY (country_id) REFERENCES Country(country_id);")
+                        .then((alterResult) => {
+                            console.log("alterResult CONFLICT");
+                            console.log(alterResult);
+                            
+                            query("ALTER TABLE Macro ADD CONSTRAINT fk_country_id2 FOREIGN KEY (country_id) REFERENCES Country(country_id);")
+                            .then((alterResult2) => {
+                                console.log("alterResult Macro");
+                                console.log(alterResult2);
+                                query("ALTER TABLE Actor ADD CONSTRAINT fk_conflict_id FOREIGN KEY (conflict_id) REFERENCES Conflict(conflict_id);")
+                                .then((alterResult3) => {
+                                    console.log("alterResult Actor");
+                                    console.log(alterResult3);
+                                    readCSVPopulation(fileAdrPopulation);
+                                });
+                            })
+                        })
+                    }
+                    
+                    
                 })
                 .catch((err) => {
                     console.log(err);
@@ -367,17 +465,16 @@ function connectAndCreateTables(dbName) {
 /**
  * Creates a database
  * @param {String} fileAdr 
- * @param {String} dbName 
  */
-function connectAndCreateDatabase(fileAdr, dbName) {
+function connectAndCreateDatabase(fileAdr) {
     con = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: ""
+        host: host,
+        user: user,
+        password: password
       });
     
     con.connect(function(err) {
-        createDatabase(dbName)
+        createDatabase()
         .then((result) => { 
             console.log(result);
             con.end();
