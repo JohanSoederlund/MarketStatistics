@@ -6,23 +6,23 @@ import socket from './websocket.js';
 
 class Form extends Component {
 
-    state = {
-        selectedCountryOption: {value: "*"},
-        selectedYearOption: {value: 0},
-        macro: false,
-        conflicts: false,
-      }
+    
 
   constructor(props) {
     super(props);
-    
-
+    this.state = {
+      selectedCountryOption: {value: "*"},
+      selectedYearOption: {value: 0},
+      macro: false,
+      conflicts: false,
+      value: "*",
+    }
     this.handleCountryChange = this.handleCountryChange.bind(this);
     this.handleYearChange = this.handleYearChange.bind(this);
     this.handleMacroChange = this.handleChange.bind(this);
-    
-
     this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.handleChange2 = this.handleChange2.bind(this)
   }
 
   componentDidMount() {
@@ -38,9 +38,14 @@ class Form extends Component {
       socket.emit("updateTable", query)
       console.log(query);
     } else if(this.state.conflicts) {
-      query = "CALL sp_getConflicts('" + this.state.selectedCountryOption.value + "', " + this.state.selectedYearOption.value + ")";
+      query = "CALL sp_getConflicts('" + this.state.selectedCountryOption.value + "', " + this.state.selectedYearOption.value + ", '" + this.state.value + "')";
       socket.emit("updateTable", query)
       console.log(query);
+    } else if(this.state.value !== "") {
+      query = "CALL sp_getActorCountry('" + this.state.selectedCountryOption.value + "', '" + this.state.value + "')";
+      socket.emit("updateTable", query)
+      console.log(query);
+ 
     } else {
       query = "CALL sp_getMacroSmall('" + this.state.selectedCountryOption.value + "', " + this.state.selectedYearOption.value + ")";
       socket.emit("updateTable", query)
@@ -70,6 +75,11 @@ class Form extends Component {
     this.setState({
       [name]: value
     });
+  }
+
+  handleChange2 = (event) => {
+    this.setState({value: event.target.value});
+    console.log(this.state.value);
   }
 
 
@@ -116,6 +126,10 @@ class Form extends Component {
             </div>
         </div>
 
+        <div className="groups2">
+            <input className="textField" autocomplete="off" type="text" name="actor" value={this.state.value} onChange={this.handleChange2}/>
+            <div className="element"><label className="labels">Actor: </label></div>
+        </div>
         <input className="button" id="submit-button" align="center" type="submit" value="SUBMIT" />
       </form>)
       

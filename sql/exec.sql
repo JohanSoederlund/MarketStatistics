@@ -1,4 +1,4 @@
-
+CALL createIndex();
     
 CALL sp_getMacroSmall('Angola', 0);
 CALL sp_getMacroSmall('Angola', 1997);
@@ -14,3 +14,12 @@ CALL sp_getMacro('*', 0);
 CALL sp_getCountries();
 
 CALL sp_getConflicts('Angola', 1997);
+
+CALL sp_getMacro('*', 1997);
+
+CALL sp_getConflicts('Zambia', 1997);
+
+select * from Actor where conflict_id = 425023
+
+
+

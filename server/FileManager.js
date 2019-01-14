@@ -165,13 +165,15 @@ function readCSVConflict(fileAdr) {
             insertActorValues.push([
                 conflict_id,
                 actor1,
-                associative_actor1
+                associative_actor1,
+                true
             ]);
             
             insertActorValues.push([
                 conflict_id,
                 actor2,
-                associative_actor2
+                associative_actor2,
+                false
             ]);
         }
         
@@ -331,7 +333,7 @@ function insertInto(values, tableName) {
             sql = "INSERT INTO Macro (country_id, gdp, population, macro_year) VALUES ?";
             break;
         case "actor":
-            sql = "INSERT INTO Actor (conflict_id, actor_name, associative_actor) VALUES ?";
+            sql = "INSERT INTO Actor (conflict_id, actor_name, associative_actor, agressor) VALUES ?";
             break;
         default:
             break;
@@ -422,7 +424,7 @@ function connectAndCreateTables() {
             sql.push("CREATE TABLE Country (country_id int PRIMARY KEY auto_increment, country_code varchar(3), country_name varchar(40))");
             sql.push("CREATE TABLE Conflict (conflict_id int PRIMARY KEY auto_increment, country_id int NOT NULL DEFAULT 0, event_type varchar(1000), fatalities int, conflict_date Date, conflict_year int, location varchar(1000))");
             sql.push("CREATE TABLE Macro (macro_id int PRIMARY KEY auto_increment, country_id int NOT NULL DEFAULT 0, gdp bigint(20), population bigint(20), macro_year int)");
-            sql.push("CREATE TABLE Actor (actor_id int PRIMARY KEY auto_increment, conflict_id int NOT NULL DEFAULT 0, actor_name varchar(1000), associative_actor varchar(1000))");
+            sql.push("CREATE TABLE Actor (actor_id int PRIMARY KEY auto_increment, conflict_id int NOT NULL DEFAULT 0, actor_name varchar(1000), associative_actor varchar(1000), agressor boolean)");
             var counter = 0;
             sql.forEach(element => {
                 createTable(element)

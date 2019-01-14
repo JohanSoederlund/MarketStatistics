@@ -11,9 +11,15 @@ This application is a SQL database for macro-statistics for countries (fatalitie
     * const user = "root";
     * const password = "";
 5. Run 'Node server/FileManager
-6. Run 'Node server/websocket
-7. Run npm start
-8. Open [ConflictStatistics](localhost:3000) in browser
+6. Execute stored procedures
+    * createIndex
+    * sp_getMacroSmallJoin
+    * sp_getMacro
+    * sp_getCountries
+    * sp_getConflicts
+7. Run 'Node server/websocket
+8. Run npm start
+9. Open [ConflictStatistics](localhost:3000) in browser
 
 ## Data source
 * [The correlates of war project](http://www.correlatesofwar.org/data-sets/world-religion-data/wrp-national-data-1/view) for religion statistics

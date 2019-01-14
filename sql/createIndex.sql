@@ -1,5 +1,5 @@
 DELIMITER //
-DROP procedure if exists createIndex //
+DROP PROCEDURE IF EXISTS createIndex //
 CREATE PROCEDURE createIndex()
 BEGIN
 
